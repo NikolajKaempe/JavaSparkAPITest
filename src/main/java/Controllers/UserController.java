@@ -10,8 +10,8 @@ public class UserController {
 
     public UserController(final UserService userService) {
 
-        userService.createUser("Mark","Mark@mark.kram");
         userService.createUser("Thomas","thomas@mh.dk");
+        userService.createUser("Mark","Mark@mark.kram");
 
         get("/users", (req, res) -> userService.getAllUsers(), json());
 
