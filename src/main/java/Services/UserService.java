@@ -2,8 +2,10 @@ package Services;
 
 import Models.User;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,24 +13,39 @@ import java.util.Map;
 
 public class UserService {
 
-    Dao<User,String> userDao;
-    private Map<String, User> users = new HashMap<>();
-    private int amountOfUsers = 0;
-    public UserService(ConnectionSource connectionSource)
+    private Dao<User,Integer> userDao;
+    private Map<Integer, User> users = new HashMap<>();
+
+    private int amountOfUsers = 0; // for Dummy Id's
+
+    public UserService(Dao<User,Integer> userDao)
     {
-        ///userDao = DaoManager.createDao(connectionSource, User.class);
+        this.userDao = userDao;
     }
 
-    public List<User> getAllUsers() { return new ArrayList<>(users.values()); }
-
-    public User getUser(String id) {
-        return users.get(id);
+    public List<User> getAllUsers() {
+        try {
+            return userDao.queryForAll();
+        } catch (SQLException e) {
+            return new ArrayList<User>();
+        }
     }
+
+    public User getUser(int id) {
+        User user = null;
+        try {
+            user = userDao.queryForId(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
 
     public User createUser(String name, String email) {
         failIfInvalid(name, email);
         User user = new User(name, email,this.amountOfUsers++);
-        users.put(""+user.getId(), user);
+        users.put(user.getId(), user);
         return user;
     }
 
